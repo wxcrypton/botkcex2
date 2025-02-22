@@ -1,4 +1,6 @@
 import asyncio
+import psycopg2
+import os
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
