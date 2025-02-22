@@ -1,36 +1,24 @@
 import asyncio
 import os
 import psycopg2
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
     Application,
     CommandHandler,
     CallbackContext,
     MessageHandler,
     filters,
-    ConversationHandler,
-    CallbackQueryHandler,
 )
 import random
-import re
 
 # توکن ربات شما (باید در محیط تنظیم شود)
-TOKEN = os.getenv("TOKEN")
+TOKEN = os.getenv("7954472940:AAEabpYVmZYXccS6vzFVDh0hqf05Lsz994I")
 
 # اطلاعات دیتابیس PostgreSQL
-DATABASE_URL = "postgresql://bot_user:kT6mEIstLOzoh95FlXeGfSQ2cfBVIq15@dpg-cusngkjtq21c73b69gmfg-a:5432/bot_database_r6me"
+DATABASE_URL = "postgresql://bot_user:kT6mEIstLOzoh95FlXeGfSQ2cfBVIq15@dpg-cusngkjtq21c73b6gmfg-a:5432/bot_database_r6me"
 
 # شناسه کاربری شما (ایدی عددی شما در تلگرام)
 ADMIN_IDS = [5092758824, 7754882804]
-
-# گروهی که اکانت‌ها به آن ارسال می‌شوند
-GROUP_ID = -1002453133373  # مقدار را با آی‌دی عددی گروه خود جایگزین کنید
-
-# حالت‌های ربات
-AWAITING_PHONE_NUMBER = 1
-AWAITING_EMAIL = 2
-AWAITING_PASSWORD = 3
-AWAITING_WITHDRAWAL_INFO = 4
 
 # ایجاد اتصال به دیتابیس PostgreSQL
 conn = psycopg2.connect(DATABASE_URL, sslmode="require")
@@ -48,6 +36,15 @@ cursor.execute('''
     CREATE TABLE IF NOT EXISTS balances (
         user_id BIGINT PRIMARY KEY,
         balance BIGINT DEFAULT 0
+    )
+''')
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS transactions (
+        id SERIAL PRIMARY KEY,
+        user_id BIGINT,
+        amount BIGINT,
+        status VARCHAR(20) DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
 ''')
 conn.commit()
@@ -103,6 +100,41 @@ async def handle_text_buttons(update: Update, context: CallbackContext):
         await get_total_users(update, context)
     elif text == "🔙 بازگشت":
         await send_main_menu(update, context)
+
+async def send_registration_messages(update: Update, context: CallbackContext):
+    await update.message.reply_text("📝 برای ثبت نام، مراحل زیر را دنبال کنید...")
+
+async def referral_command(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    referral_link = f"https://t.me/your_bot_username?start={user_id}"
+    await update.message.reply_text(f"🔗 لینک زیرمجموعه‌گیری شما:\n{referral_link}")
+
+async def my_referrals_command(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    cursor.execute('SELECT COUNT(*) FROM referrals WHERE referred_by = %s', (user_id,))
+    count = cursor.fetchone()[0]
+    await update.message.reply_text(f"📊 تعداد زیرمجموعه‌های شما: {count}")
+
+async def list_referrals_command(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    cursor.execute('SELECT user_id FROM referrals WHERE referred_by = %s', (user_id,))
+    referrals = cursor.fetchall()
+    if referrals:
+        referral_list = "\n".join([f"👤 {ref[0]}" for ref in referrals])
+        await update.message.reply_text(f"📋 لیست زیرمجموعه‌های شما:\n{referral_list}")
+    else:
+        await update.message.reply_text("📋 شما هنوز زیرمجموعه‌ای ندارید.")
+
+async def show_account_menu(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    cursor.execute('SELECT balance FROM balances WHERE user_id = %s', (user_id,))
+    balance = cursor.fetchone()[0]
+    await update.message.reply_text(f"👤 موجودی حساب شما: {balance} تومان")
+
+async def get_total_users(update: Update, context: CallbackContext):
+    cursor.execute('SELECT COUNT(*) FROM referrals')
+    total_users = cursor.fetchone()[0]
+    await update.message.reply_text(f"📊 تعداد کل کاربران: {total_users}")
 
 async def main():
     application = Application.builder().token(TOKEN).build()
