@@ -325,6 +325,7 @@ async def send_registration_messages(update: Update, context: CallbackContext):
         "1️⃣ ابتدا وارد سایت شوید.\n"
         "2️⃣ اطلاعات خود را وارد کنید.\n"
         "3️⃣ ثبت نام را تکمیل کنید."
+        "**برای اطلاعات بیشتر به چنل @w_null مراجعه فرمایید"
     ]
     for msg in messages:
         await update.message.reply_text(msg)
