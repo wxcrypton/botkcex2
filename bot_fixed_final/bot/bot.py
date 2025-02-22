@@ -1,4 +1,5 @@
 import asyncio
+import os
 import psycopg2
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
@@ -8,17 +9,18 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+import random
 
-# توکن ربات شما (مستقیماً در کد وارد شده است)
-TOKEN = '7954472940:AAEabpYVmZYXccS6vzFVDh0hqf05Lsz994I'
+# دریافت توکن از متغیرهای محیطی
+TOKEN = os.getenv("TOKEN")
 
 # اطلاعات دیتابیس PostgreSQL
-DATABASE_URL = "postgresql://bot_user:kT6mEIstLOzoh95FlXeGfSQ2cfBVIq15@dpg-cusngkjtq21c73b6gmfg-a:5432/bot_database_r6me"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# شناسه کاربری شما (ایدی عددی شما در تلگرام)
+# شناسه کاربری ادمین‌ها
 ADMIN_IDS = [5092758824, 7754882804]
 
-# ایجاد اتصال به دیتابیس PostgreSQL
+# اتصال به دیتابیس
 conn = psycopg2.connect(DATABASE_URL, sslmode="require")
 cursor = conn.cursor()
 
@@ -104,8 +106,9 @@ async def send_registration_messages(update: Update, context: CallbackContext):
 
 async def referral_command(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
-    referral_link = f"https://t.me/your_bot_username?start={user_id}"
-    await update.message.reply_text(f"🔗 لینک زیرمجموعه‌گیری شما:\n{referral_link}")
+    referral_link = f"https://t.me/YOUR_BOT_USERNAME?start={user_id}"
+    await update.message.reply_text(f"🔗 لینک زیرمجموعه‌گیری شما:
+{referral_link}")
 
 async def my_referrals_command(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
@@ -118,8 +121,10 @@ async def list_referrals_command(update: Update, context: CallbackContext):
     cursor.execute('SELECT user_id FROM referrals WHERE referred_by = %s', (user_id,))
     referrals = cursor.fetchall()
     if referrals:
-        referral_list = "\n".join([f"👤 {ref[0]}" for ref in referrals])
-        await update.message.reply_text(f"📋 لیست زیرمجموعه‌های شما:\n{referral_list}")
+        referral_list = "
+".join([f"👤 {ref[0]}" for ref in referrals])
+        await update.message.reply_text(f"📋 لیست زیرمجموعه‌های شما:
+{referral_list}")
     else:
         await update.message.reply_text("📋 شما هنوز زیرمجموعه‌ای ندارید.")
 
