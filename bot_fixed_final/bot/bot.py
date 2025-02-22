@@ -1,5 +1,4 @@
 import asyncio
-import os
 import psycopg2
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
@@ -9,10 +8,9 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-import random
 
-# توکن ربات شما (باید در محیط تنظیم شود)
-TOKEN = os.getenv("7954472940:AAEabpYVmZYXccS6vzFVDh0hqf05Lsz994I")
+# توکن ربات شما (مستقیماً در کد وارد شده است)
+TOKEN = "7954472940:AAEabpYVmZYXccS6vzFVDh0hqf05Lsz994I"
 
 # اطلاعات دیتابیس PostgreSQL
 DATABASE_URL = "postgresql://bot_user:kT6mEIstLOzoh95FlXeGfSQ2cfBVIq15@dpg-cusngkjtq21c73b6gmfg-a:5432/bot_database_r6me"
