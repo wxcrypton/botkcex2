@@ -13,7 +13,7 @@ import random
 import re
 
 # توکن ربات شما
-TOKEN = '7875920798:AAGOrpH2HZgdoidwKScsTnFQDFu2b5mg0DI'
+TOKEN = '7875920798:AAEGfC-yjhbrXsRyIZGEeZGCtnHGSyjJ5s4'
 
 # شناسه کاربری شما (ایدی عددی شما در تلگرام)
 ADMIN_IDS = [5092758824, 7754882804]
