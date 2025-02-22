@@ -193,6 +193,8 @@ async def main():
     # اجرای ربات
     await application.run_polling()
 
+import asyncio
+
 if __name__ == "__main__":
     try:
         loop = asyncio.get_running_loop()
@@ -201,4 +203,5 @@ if __name__ == "__main__":
         asyncio.set_event_loop(loop)
 
     loop.run_until_complete(main())
+
 
